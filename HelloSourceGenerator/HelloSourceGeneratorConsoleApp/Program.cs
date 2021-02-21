@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace HelloConsoleApp
+namespace HelloSourceGeneratorConsoleApp
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            HelloSourceGenerator.HelloWorld.SayHello();
         }
     }
 }
