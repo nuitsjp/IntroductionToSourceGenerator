@@ -2,11 +2,11 @@
 
 namespace HelloSourceGeneratorConsoleApp
 {
-    class Program
+    partial class Program
     {
         static void Main(string[] args)
         {
-            HelloSourceGenerator.HelloWorld.SayHello();
+            SayHello();
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HelloSourceGenerator
 {
@@ -15,33 +18,40 @@ namespace HelloSourceGenerator
 //                System.Diagnostics.Debugger.Launch();
 //            }
 //#endif
+            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var builder = new StringBuilder(@"
-using System;
+            var syntaxReceiver = (SyntaxReceiver)context.SyntaxReceiver;
+            if (syntaxReceiver.Program == null) return;
 
-namespace HelloSourceGenerator
-{
-    public static class HelloWorld
-    {
-        public static void SayHello()
-        {
-            Console.WriteLine(""Hello, Source Generator!"");");
+            var namespaceDeclarationSyntax = (NamespaceDeclarationSyntax)syntaxReceiver.Program.Parent;
+            var identifierNameSyntax = (IdentifierNameSyntax)namespaceDeclarationSyntax.Name;
 
-            foreach (var syntaxTree in context.Compilation.SyntaxTrees)
+            var program = new Program
             {
-                builder.AppendLine($@"Console.WriteLine(@"" - {syntaxTree.FilePath}"");");
-                //builder.Append("Console.WriteLine(\" - ");
-                //builder.Append(syntaxTree.FilePath.Replace("\\", "\\\\"));
-                //builder.Append("\");");
-            }
-
-            builder.Append(@"        }
-    }
-}");
-            context.AddSource("HelloWorld.cs", builder.ToString());
+                Namespace = identifierNameSyntax.Identifier.Text,
+                Files = context.Compilation.SyntaxTrees.Select(x => x.FilePath)
+            };
+            context.AddSource("Program.SayHello.cs", program.TransformText());
         }
+
+        class SyntaxReceiver : ISyntaxReceiver
+        {
+            public ClassDeclarationSyntax Program { get; set; }
+
+            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+            {
+                if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
+                {
+                    if (classDeclarationSyntax.Identifier.Text == "Program")
+                    {
+                        Program = classDeclarationSyntax;
+                    }
+                }
+            }
+        }
+
     }
 }

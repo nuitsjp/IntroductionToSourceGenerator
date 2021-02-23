@@ -1,0 +1,23 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" linePragmas="false" #>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+using System;
+
+namespace <#= Namespace #>
+{
+    partial class Program
+    {
+        public static void SayHello()
+        {
+            Console.WriteLine("Hello, T4 Template with Source Generator!");
+<#
+foreach(var file in Files)
+{
+#>
+            Console.WriteLine(" - <#= file.Replace("\\", "\\\\") #>");
+<#
+}
+#>
+}
+    }
+}
