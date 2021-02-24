@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 using Xunit;
+using Xunit.Sdk;
 
 namespace HelloSourceGenerator.Test
 {
@@ -25,7 +28,7 @@ namespace MyNamespace
             var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
 
             var generator = new HelloWorldGenerator();
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            var driver = CSharpGeneratorDriver.Create(generator);
             var runResult = driver
                 .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
                 .GetRunResult();
@@ -45,32 +48,46 @@ namespace MyNamespace
         }
     }
 }");
-
-            Assert.Empty(expected.GetChanges(runResult.GeneratedTrees.Single()));
+            Equal(expected, runResult.GeneratedTrees.Single());
         }
 
-        [Fact]
-        public void FooクラスにSayHelloメソッドが追加されない()
+        private static void Equal(SyntaxTree expected, SyntaxTree actual)
         {
-            var input = CSharpSyntaxTree.ParseText(@"using System;
+            var diff = expected.GetChanges(actual);
+            if (!diff.Any()) return;
 
-namespace MyNamespace
-{
-    partial class Foo
-    {
-    }
-}
-");
-
-            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
-
-            var generator = new HelloWorldGenerator();
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-            var runResult = driver
-                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
-                .GetRunResult();
-
-            Assert.Empty(runResult.GeneratedTrees);
+            var detail = string.Join(". ", diff.Select(x => x.ToString()));
+            var userMessage = $"Generated SyntaxTree differs from the expected one. {detail}";
+            throw new AssertActualExpectedException(
+                expected, 
+                actual, 
+                userMessage, 
+                "Expected SyntaxTree", 
+                "Actual SyntaxTree");
         }
+
+//        [Fact]
+//        public void FooクラスにSayHelloメソッドが追加されない()
+//        {
+//            var input = CSharpSyntaxTree.ParseText(@"using System;
+
+//namespace MyNamespace
+//{
+//    partial class Foo
+//    {
+//    }
+//}
+//");
+
+//            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
+
+//            var generator = new HelloWorldGenerator();
+//            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+//            var runResult = driver
+//                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
+//                .GetRunResult();
+
+//            Assert.Empty(runResult.GeneratedTrees);
+//        }
     }
 }
