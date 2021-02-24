@@ -37,7 +37,7 @@ foreach(var file in Files)
 
 }
 
-            this.Write("}\r\n    }\r\n}");
+            this.Write("        }\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
