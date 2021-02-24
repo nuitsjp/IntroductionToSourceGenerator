@@ -14,20 +14,27 @@ namespace HelloSourceGenerator.Test
         {
             var input = CSharpSyntaxTree.ParseText(@"using System;
 
-namespace HelloSourceGeneratorConsoleApp
+namespace MyNamespace
 {
     partial class Program
     {
-        static void Main(string[] args)
-        {
-        }
     }
 }
 ", path: "C:\\Program.cs");
 
+            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
+
+            var generator = new HelloWorldGenerator();
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+            var runResult = driver
+                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
+                .GetRunResult();
+
+            Assert.Single(runResult.GeneratedTrees);
+
             var expected = CSharpSyntaxTree.ParseText(@"using System;
 
-namespace HelloSourceGeneratorConsoleApp
+namespace MyNamespace
 {
     partial class Program
     {
@@ -39,17 +46,31 @@ namespace HelloSourceGeneratorConsoleApp
     }
 }");
 
-            var inputCompilation = CSharpCompilation.Create("compilation",
-                new[] { input },
-                new[] { MetadataReference.CreateFromFile(typeof(int).GetTypeInfo().Assembly.Location) },
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+            Assert.Empty(expected.GetChanges(runResult.GeneratedTrees.Single()));
+        }
+
+        [Fact]
+        public void FooクラスにSayHelloメソッドが追加されない()
+        {
+            var input = CSharpSyntaxTree.ParseText(@"using System;
+
+namespace MyNamespace
+{
+    partial class Foo
+    {
+    }
+}
+");
+
+            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
 
             var generator = new HelloWorldGenerator();
             GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-            var runResult = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _).GetRunResult();
+            var runResult = driver
+                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
+                .GetRunResult();
 
-            Assert.Single(runResult.GeneratedTrees);
-            Assert.Empty(expected.GetChanges(runResult.GeneratedTrees.Single()));
+            Assert.Empty(runResult.GeneratedTrees);
         }
     }
 }
