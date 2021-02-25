@@ -10,6 +10,15 @@ namespace HelloSourceGenerator
     [Generator]
     public class HelloWorldGenerator : ISourceGenerator
     {
+        private const string Id = "HW0001";
+        private static readonly DiagnosticDescriptor ClassNameIsNotProgram = new DiagnosticDescriptor(
+            Id,
+            "Class name is not Program",
+            "'{0}' is not Program",
+            "Usage",
+            DiagnosticSeverity.Warning,
+            true);
+
         public void Initialize(GeneratorInitializationContext context)
         {
 //#if DEBUG
@@ -24,31 +33,41 @@ namespace HelloSourceGenerator
         public void Execute(GeneratorExecutionContext context)
         {
             var syntaxReceiver = (SyntaxReceiver)context.SyntaxReceiver;
-            if (syntaxReceiver.Program == null) return;
 
-            var namespaceDeclarationSyntax = (NamespaceDeclarationSyntax)syntaxReceiver.Program.Parent;
-            var identifierNameSyntax = (IdentifierNameSyntax)namespaceDeclarationSyntax.Name;
-
-            var program = new Program
+            foreach (var classDeclarationSyntax in syntaxReceiver.Classes)
             {
-                Namespace = identifierNameSyntax.Identifier.Text,
-                Files = context.Compilation.SyntaxTrees.Select(x => x.FilePath)
-            };
-            context.AddSource("Program.SayHello.cs", program.TransformText());
+                if (classDeclarationSyntax.Identifier.Text == "Program")
+                {
+                    var namespaceDeclarationSyntax = (NamespaceDeclarationSyntax)classDeclarationSyntax.Parent;
+                    var identifierNameSyntax = (IdentifierNameSyntax)namespaceDeclarationSyntax.Name;
+
+                    var program = new Program
+                    {
+                        Namespace = identifierNameSyntax.Identifier.Text,
+                        Files = context.Compilation.SyntaxTrees.Select(x => x.FilePath)
+                    };
+                    context.AddSource("Program.SayHello.cs", program.TransformText());
+                }
+                else
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            ClassNameIsNotProgram, 
+                            classDeclarationSyntax.GetLocation(), 
+                            classDeclarationSyntax.Identifier.Text));
+                }
+            }
         }
 
         class SyntaxReceiver : ISyntaxReceiver
         {
-            public ClassDeclarationSyntax Program { get; set; }
+            public List<ClassDeclarationSyntax> Classes { get; } = new List<ClassDeclarationSyntax>();
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {
                 if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
                 {
-                    if (classDeclarationSyntax.Identifier.Text == "Program")
-                    {
-                        Program = classDeclarationSyntax;
-                    }
+                    Classes.Add(classDeclarationSyntax);
                 }
             }
         }

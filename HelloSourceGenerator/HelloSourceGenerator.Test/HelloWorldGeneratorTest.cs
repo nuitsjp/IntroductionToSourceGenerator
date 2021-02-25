@@ -66,28 +66,28 @@ namespace MyNamespace
                 "Actual SyntaxTree");
         }
 
-//        [Fact]
-//        public void FooクラスにSayHelloメソッドが追加されない()
-//        {
-//            var input = CSharpSyntaxTree.ParseText(@"using System;
+        [Fact]
+        public void FooクラスにSayHelloメソッドが追加されない()
+        {
+            var input = CSharpSyntaxTree.ParseText(@"using System;
 
-//namespace MyNamespace
-//{
-//    partial class Foo
-//    {
-//    }
-//}
-//");
+namespace MyNamespace
+{
+    partial class Foo
+    {
+    }
+}
+");
 
-//            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
+            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
 
-//            var generator = new HelloWorldGenerator();
-//            GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-//            var runResult = driver
-//                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
-//                .GetRunResult();
+            var generator = new HelloWorldGenerator();
+            var driver = CSharpGeneratorDriver.Create(generator);
+            var runResult = driver
+                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
+                .GetRunResult();
 
-//            Assert.Empty(runResult.GeneratedTrees);
-//        }
+            Assert.Empty(runResult.GeneratedTrees);
+        }
     }
 }
