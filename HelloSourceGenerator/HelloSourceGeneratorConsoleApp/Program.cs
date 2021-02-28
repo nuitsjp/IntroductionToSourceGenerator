@@ -7,6 +7,12 @@ namespace HelloSourceGeneratorConsoleApp
         static void Main(string[] args)
         {
             SayHello();
+            Foo.SayHello();
         }
+    }
+
+    public partial class Foo
+    {
+
     }
 }
