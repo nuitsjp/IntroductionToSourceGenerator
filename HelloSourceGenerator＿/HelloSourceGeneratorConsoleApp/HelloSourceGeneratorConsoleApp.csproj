@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HelloSourceGenerator\HelloSourceGenerator.csproj"
+    <ProjectReference Include="..\HelloSourceGenerator\HelloSourceGenerator.csproj" 
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false"/>
   </ItemGroup>

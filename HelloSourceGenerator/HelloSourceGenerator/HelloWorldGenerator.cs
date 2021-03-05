@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Schema;
+﻿using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -11,15 +7,6 @@ namespace HelloSourceGenerator
     [Generator]
     public class HelloWorldGenerator : ISourceGenerator
     {
-        private const string Id = "HW0001";
-        private static readonly DiagnosticDescriptor DeclaredOtherThanPartial = new DiagnosticDescriptor(
-            Id,
-            "Program class can only be declared partial",
-            "'{0}' has been declared",
-            "Usage",
-            DiagnosticSeverity.Warning,
-            true);
-
         public void Initialize(GeneratorInitializationContext context)
         {
 //#if DEBUG
@@ -33,31 +20,27 @@ namespace HelloSourceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var syntaxReceiver = (SyntaxReceiver) context.SyntaxReceiver;
+            var syntaxReceiver = (SyntaxReceiver)context.SyntaxReceiver;
 
             foreach (var classDeclarationSyntax in syntaxReceiver.Classes)
             {
-                var namespaceDeclarationSyntax = (NamespaceDeclarationSyntax)classDeclarationSyntax.Parent;
-                var identifierNameSyntax = (IdentifierNameSyntax)namespaceDeclarationSyntax.Name;
+                var namespaceDeclarationSyntax = (NamespaceDeclarationSyntax) classDeclarationSyntax.Parent;
+                var identifierNameSyntax = (IdentifierNameSyntax) namespaceDeclarationSyntax.Name;
                 var namespaceName = identifierNameSyntax.Identifier.Text;
                 var typeName = classDeclarationSyntax.Identifier.Text;
 
-                var source = $@"
-using System;
-
-namespace {namespaceName}
+                var source = $@"namespace {namespaceName}
 {{
     partial class {typeName}
     {{
-        public static void SayHello()
+        public override string ToString()
         {{
-            Console.WriteLine(""Hello, Source Generator by {typeName}!"");
+            return ""Hello, Source Generator! by {typeName}"";
         }}
     }}
 }}";
-                context.AddSource($"{typeName}.SayHello.cs", source);
+                context.AddSource($"{typeName}.ToString.cs", source);
             }
-
         }
 
         class SyntaxReceiver : ISyntaxReceiver

@@ -6,12 +6,12 @@ namespace HelloSourceGeneratorConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(new Program().ToString());
-            Console.WriteLine(new Foo().ToString());
+            SayHello();
+            Foo.SayHello();
         }
     }
 
-    partial class Foo
+    public partial class Foo
     {
 
     }
