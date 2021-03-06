@@ -4,8 +4,6 @@
 ## Release 1.0
 
 ### New Rules
-
 Rule ID | Category | Severity | Notes
---------|----------|----------|--------------------
-HW0001 | Usage | Warning | ClassNameIsNotProgram, [Documentation](https://google.com)
-
+--------|----------|----------|-------
+HW0001 | Usege | Error | HelloWorldAnalyzer, [Documentation](https://google.co.jp)

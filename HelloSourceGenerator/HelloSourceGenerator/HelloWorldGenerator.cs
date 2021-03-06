@@ -39,7 +39,7 @@ namespace HelloSourceGenerator
         }}
     }}
 }}";
-                context.AddSource($"{typeName}.ToString.cs", source);
+                context.AddSource($"{typeName}.g.cs", source);
             }
         }
 

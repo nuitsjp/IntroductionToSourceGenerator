@@ -20,14 +20,14 @@ namespace MyNamespace
     {
     }
 }
-", path: "C:\\Program.cs");
+");
 
             var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
             var generator = new HelloWorldGenerator();
             var driver = CSharpGeneratorDriver.Create(generator);
 
-            var runResult = driver
-                .RunGeneratorsAndUpdateCompilation(inputCompilation, out _, out _)
+            GeneratorDriverRunResult runResult = driver
+                .RunGenerators(inputCompilation)
                 .GetRunResult();
 
             Assert.Single(runResult.GeneratedTrees);
@@ -59,6 +59,5 @@ namespace MyNamespace
                 "Expected SyntaxTree",
                 "Actual SyntaxTree");
         }
-
     }
 }
