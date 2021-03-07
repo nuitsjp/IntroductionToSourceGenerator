@@ -45,6 +45,32 @@ namespace MyNamespace
             Equal(expected, runResult.GeneratedTrees.Single());
         }
 
+        [Fact]
+        public void ToString‚ªŽÀ‘•Ï‚Ý‚Ì‚Æ‚«ƒR[ƒh‚ª’Ç‰Á‚³‚ê‚È‚¢()
+        {
+            var input = CSharpSyntaxTree.ParseText(@"using System;
+
+namespace MyNamespace
+{
+    partial class Program
+    {
+        public override string ToString() => string.Empty;
+    }
+    }
+");
+
+            var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
+            var generator = new HelloWorldGenerator();
+            var driver = CSharpGeneratorDriver.Create(generator);
+
+            GeneratorDriverRunResult runResult = driver
+                .RunGenerators(inputCompilation)
+                .GetRunResult();
+
+            Assert.Empty(runResult.GeneratedTrees);
+        }
+
+
         private static void Equal(SyntaxTree expected, SyntaxTree actual)
         {
             var diff = expected.GetChanges(actual);

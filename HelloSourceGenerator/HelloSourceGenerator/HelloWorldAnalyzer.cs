@@ -11,16 +11,18 @@ namespace HelloSourceGenerator
     {
         public const string ToStringIsImplementedId = "HW0001";
 
-        public static readonly DiagnosticDescriptor Rule =
+        private const string Usage = "Usage";
+
+        public static readonly DiagnosticDescriptor ToStringIsImplemented =
             new DiagnosticDescriptor(
                 id: ToStringIsImplementedId,
-                title: "ToStringメソッドが実装されています",
-                messageFormat: "{0} にToStringメソッドが実装されています",
-                category: "Usege",
+                title: AnalyzerResources.Title,
+                messageFormat: AnalyzerResources.MessageFormat,
+                category: Usage,
                 defaultSeverity: DiagnosticSeverity.Error,
                 isEnabledByDefault: true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ToStringIsImplemented);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -37,13 +39,11 @@ namespace HelloSourceGenerator
 
             var typeDeclarationSyntax = (TypeDeclarationSyntax)methodDeclarationSyntax.Parent;
 
-
             context.ReportDiagnostic(
                 Diagnostic.Create(
-                    Rule,
+                    ToStringIsImplemented,
                     methodDeclarationSyntax.Identifier.GetLocation(),
                     typeDeclarationSyntax.Identifier.Text));
-
         }
     }
 }

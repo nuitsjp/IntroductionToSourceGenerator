@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -51,6 +52,14 @@ namespace HelloSourceGenerator
             {
                 if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
                 {
+                    if (classDeclarationSyntax
+                        .Members
+                        .OfType<MethodDeclarationSyntax>()
+                        .Any(x => x.Identifier.Text == "ToString"))
+                    {
+                        return;
+                    }
+
                     Classes.Add(classDeclarationSyntax);
                 }
             }

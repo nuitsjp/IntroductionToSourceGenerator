@@ -10,7 +10,7 @@ namespace HelloSourceGenerator.Test
     public class HelloWorldAnalyzerTest
     {
         [Fact]
-        public async Task AnalyzeAsync()
+        public async Task ToStringが実装済みのときエラーが通知されCodeFixが提案される()
         {
             var source = @"
 using System;
@@ -31,15 +31,12 @@ namespace HelloSourceGeneratorConsoleApp
     }
 }
 ";
-            var diagnostic = CSharpAnalyzerVerifier<HelloWorldAnalyzer>
-                .Diagnostic(HelloWorldAnalyzer.Rule)
+            var expected = CSharpAnalyzerVerifier<HelloWorldAnalyzer>
+                .Diagnostic(HelloWorldAnalyzer.ToStringIsImplemented)
                 .WithLocation(13, 32)
                 .WithArguments("Program");
 
-            await CSharpCodeFixVerifier<HelloWorldAnalyzer, HelloWorldFixProvider>.VerifyCodeFixAsync(
-                source,
-                new[] { diagnostic },
-                @"
+            var fixedSource = @"
 using System;
 
 namespace HelloSourceGeneratorConsoleApp
@@ -52,8 +49,31 @@ namespace HelloSourceGeneratorConsoleApp
         }
     }
 }
-");
+";
 
+            await CSharpCodeFixVerifier<HelloWorldAnalyzer, HelloWorldFixProvider>
+                .VerifyCodeFixAsync(source, expected, fixedSource);
+        }
+
+        [Fact]
+        public async Task ToStringが未実装のとき通知が発生しない()
+        {
+            var source = @"
+using System;
+
+namespace HelloSourceGeneratorConsoleApp
+{
+    partial class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine(new Program().ToString());
+        }
+    }
+}
+";
+
+            await CSharpAnalyzerVerifier<HelloWorldAnalyzer>.VerifyAnalyzerAsync(source);
         }
     }
 }

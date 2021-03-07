@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Composition;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,34 +20,48 @@ namespace HelloSourceGenerator
             return WellKnownFixAllProviders.BatchFixer;
         }
 
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override Task RegisterCodeFixesAsync(CodeFixContext context)
+        {
+            foreach (var diagnostic in context.Diagnostics)
+            {
+                switch (diagnostic.Id)
+                {
+                    case HelloWorldAnalyzer.ToStringIsImplementedId:
+                        FixToStringIsImplemented(context, diagnostic);
+                        break;
+                    default:
+                        throw new NotImplementedException($"{diagnostic.Id} is not implemented.");
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private void FixToStringIsImplemented(CodeFixContext context, Diagnostic diagnostic)
+        {
+            var diagnosticSpan = diagnostic.Location.SourceSpan;
+
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: AnalyzerResources.CodeFixTitle,
+                    c => AppendComparableAsync(context, diagnostic, c),
+                    equivalenceKey: HelloWorldAnalyzer.ToStringIsImplementedId),
+                diagnostic);
+        }
+
+        private async Task<Solution> AppendComparableAsync(
+            CodeFixContext context, 
+            Diagnostic diagnostic,
+            CancellationToken cancellationToken)
         {
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
 
-            foreach (var diagnostic in context.Diagnostics)
-            {
-                var diagnosticSpan = diagnostic.Location.SourceSpan;
+            var declaration = root.FindToken(diagnostic.Location.SourceSpan.Start);
+            var methodDeclarationSyntax = (MethodDeclarationSyntax)declaration.Parent;
 
-                var declaration = root.FindToken(diagnosticSpan.Start);
-                var methodDeclarationSyntax = (MethodDeclarationSyntax)declaration.Parent;
-
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        title: "ToStringを削除する。",
-                        c => AppendComparableAsync(context.Document, methodDeclarationSyntax, c),
-                        equivalenceKey: nameof(HelloWorldAnalyzer.ToStringIsImplementedId)),
-                    diagnostic);
-            }
-
-        }
-
-        private async Task<Solution> AppendComparableAsync(Document document,
-            MethodDeclarationSyntax typeDeclaration,
-            CancellationToken cancellationToken)
-        {
-            var root = await document.GetSyntaxRootAsync(cancellationToken);
-            return document
-                .WithSyntaxRoot(root.RemoveNode(typeDeclaration, SyntaxRemoveOptions.KeepNoTrivia))
+            return context
+                .Document
+                .WithSyntaxRoot(root.RemoveNode(methodDeclarationSyntax, SyntaxRemoveOptions.KeepNoTrivia))
                 .Project
                 .Solution;
         }

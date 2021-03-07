@@ -6,4 +6,4 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-HW0001 | Usege | Error | HelloWorldAnalyzer, [Documentation](https://google.co.jp)
+HW0001 | Usage | Error | HelloWorldAnalyzer, [Documentation](https://google.co.jp)
