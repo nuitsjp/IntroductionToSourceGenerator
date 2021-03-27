@@ -7,7 +7,7 @@ using Xunit;
 
 namespace HelloSourceGenerator.Test
 {
-    public class HelloWorldAnalyzerTest
+    public class HelloAnalyzerTest
     {
         [Fact]
         public async Task ToStringが実装済みのときエラーが通知されCodeFixが提案される()
@@ -31,8 +31,8 @@ namespace HelloSourceGeneratorConsoleApp
     }
 }
 ";
-            var expected = CSharpAnalyzerVerifier<HelloWorldAnalyzer>
-                .Diagnostic(HelloWorldAnalyzer.ToStringIsImplemented)
+            var expected = CSharpAnalyzerVerifier<HelloDiagnosticAnalyzer>
+                .Diagnostic(HelloDiagnosticAnalyzer.ToStringIsImplemented)
                 .WithLocation(13, 32)
                 .WithArguments("Program");
 
@@ -51,7 +51,7 @@ namespace HelloSourceGeneratorConsoleApp
 }
 ";
 
-            await CSharpCodeFixVerifier<HelloWorldAnalyzer, HelloWorldFixProvider>
+            await CSharpCodeFixVerifier<HelloDiagnosticAnalyzer, HelloCodeFixProvider>
                 .VerifyCodeFixAsync(source, expected, fixedSource);
         }
 
@@ -73,7 +73,7 @@ namespace HelloSourceGeneratorConsoleApp
 }
 ";
 
-            await CSharpAnalyzerVerifier<HelloWorldAnalyzer>.VerifyAnalyzerAsync(source);
+            await CSharpAnalyzerVerifier<HelloDiagnosticAnalyzer>.VerifyAnalyzerAsync(source);
         }
     }
 }

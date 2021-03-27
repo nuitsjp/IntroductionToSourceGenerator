@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace HelloSourceGenerator
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(HelloWorldFixProvider)), Shared]
-    public class HelloWorldFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(HelloCodeFixProvider)), Shared]
+    public class HelloCodeFixProvider : CodeFixProvider
     {
-        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HelloWorldAnalyzer.ToStringIsImplementedId);
+        public override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(HelloDiagnosticAnalyzer.ToStringIsImplementedId);
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
@@ -26,7 +26,7 @@ namespace HelloSourceGenerator
             {
                 switch (diagnostic.Id)
                 {
-                    case HelloWorldAnalyzer.ToStringIsImplementedId:
+                    case HelloDiagnosticAnalyzer.ToStringIsImplementedId:
                         FixToStringIsImplemented(context, diagnostic);
                         break;
                     default:
@@ -45,7 +45,7 @@ namespace HelloSourceGenerator
                 CodeAction.Create(
                     title: AnalyzerResources.CodeFixTitle,
                     c => AppendComparableAsync(context, diagnostic, c),
-                    equivalenceKey: HelloWorldAnalyzer.ToStringIsImplementedId),
+                    equivalenceKey: HelloDiagnosticAnalyzer.ToStringIsImplementedId),
                 diagnostic);
         }
 

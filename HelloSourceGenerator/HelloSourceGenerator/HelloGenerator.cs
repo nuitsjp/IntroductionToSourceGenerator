@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace HelloSourceGenerator
 {
     [Generator]
-    public class HelloWorldGenerator : ISourceGenerator
+    public class HelloGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {

@@ -7,7 +7,7 @@ using Xunit.Sdk;
 
 namespace HelloSourceGenerator.Test
 {
-    public class HelloWorldGeneratorTest
+    public class HelloGeneratorTest
     {
         [Fact]
         public void ProgramクラスにToStringメソッドがオーバーライドされる()
@@ -23,7 +23,7 @@ namespace MyNamespace
 ");
 
             var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
-            var generator = new HelloWorldGenerator();
+            var generator = new HelloGenerator();
             var driver = CSharpGeneratorDriver.Create(generator);
 
             GeneratorDriverRunResult runResult = driver
@@ -60,7 +60,7 @@ namespace MyNamespace
 ");
 
             var inputCompilation = CSharpCompilation.Create("compilation", new[] { input });
-            var generator = new HelloWorldGenerator();
+            var generator = new HelloGenerator();
             var driver = CSharpGeneratorDriver.Create(generator);
 
             GeneratorDriverRunResult runResult = driver

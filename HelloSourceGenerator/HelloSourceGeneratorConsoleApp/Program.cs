@@ -13,6 +13,5 @@ namespace HelloSourceGeneratorConsoleApp
 
     partial class Foo
     {
-
     }
 }

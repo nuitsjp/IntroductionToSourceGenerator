@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 namespace HelloSourceGenerator
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class HelloWorldAnalyzer : DiagnosticAnalyzer
+    public class HelloDiagnosticAnalyzer : DiagnosticAnalyzer
     {
         public const string ToStringIsImplementedId = "HW0001";
 
